@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="자주 쓰는 AI 프롬프트를 한 페이지에서 검색하고 클릭 한 번으로 복사하세요." />
+    <title>프롬프트 모음</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="site-header">
+        <div class="site-header-text">
+          <h1 class="site-title">프롬프트 모음</h1>
+          <p class="site-subtitle">원하는 프롬프트를 찾아 클릭 한 번에 복사하세요.</p>
+        </div>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="테마 전환"
+          title="테마 전환"
+        >
+          <span class="theme-icon theme-icon--light" aria-hidden="true">☀️</span>
+          <span class="theme-icon theme-icon--dark" aria-hidden="true">🌙</span>
+        </button>
+      </header>
+
+      <section class="controls" aria-label="검색 및 필터">
+        <div class="search-field">
+          <input
+            id="search-input"
+            type="text"
+            placeholder="프롬프트 이름·설명·카테고리로 검색"
+            autocomplete="off"
+            aria-label="검색"
+          />
+        </div>
+
+        <p id="result-summary" class="result-summary" aria-live="polite" hidden></p>
+
+        <div id="category-chips" class="category-chips" role="group" aria-label="카테고리 필터">
+          <!-- 카테고리 칩은 데이터 로딩 후 동적 생성 -->
+        </div>
+      </section>
+
+      <main class="content-card">
+        <div id="state-loading" class="state-message" hidden>
+          <p>프롬프트를 불러오는 중...</p>
+        </div>
+
+        <div id="state-error" class="state-message state-error" hidden>
+          <p id="state-error-text">데이터를 불러오지 못했습니다.</p>
+          <button id="retry-button" class="btn-primary">다시 시도</button>
+        </div>
+
+        <div id="state-empty" class="state-message" hidden>
+          <p>검색 결과가 없습니다.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table id="prompt-table" class="prompt-table" hidden>
+            <thead>
+              <tr>
+                <th scope="col" class="col-no sortable" data-sort="no" aria-sort="none">
+                  <button class="sort-btn" type="button">
+                    No.<span class="sort-icon" aria-hidden="true"></span>
+                  </button>
+                </th>
+                <th scope="col" class="col-category sortable" data-sort="category" aria-sort="none">
+                  <button class="sort-btn" type="button">
+                    카테고리<span class="sort-icon" aria-hidden="true"></span>
+                  </button>
+                </th>
+                <th scope="col" class="col-name sortable" data-sort="name" aria-sort="none">
+                  <button class="sort-btn" type="button">
+                    프롬프트 이름<span class="sort-icon" aria-hidden="true"></span>
+                  </button>
+                </th>
+                <th scope="col" class="col-desc">설명</th>
+                <th scope="col" class="col-prompt">프롬프트(한글)</th>
+                <th scope="col" class="col-prompt">프롬프트(영문)</th>
+                <th scope="col" class="col-updated">최종 수정일</th>
+              </tr>
+            </thead>
+            <tbody id="prompt-tbody"></tbody>
+          </table>
+        </div>
+      </main>
+
+      <nav id="pagination" class="pagination" aria-label="페이지 이동" hidden>
+        <button class="page-btn" id="prev-page" type="button">이전</button>
+        <span class="page-info" id="page-info">1 / 1</span>
+        <button class="page-btn" id="next-page" type="button">다음</button>
+      </nav>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <div id="modal" class="modal" hidden>
+        <div class="modal-backdrop" data-close="true"></div>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <header class="modal-header">
+            <div class="modal-heading">
+              <span class="category-tag" id="modal-category"></span>
+              <h2 class="modal-title" id="modal-title"></h2>
+              <p class="modal-subtitle" id="modal-subtitle"></p>
+            </div>
+            <button class="modal-close" id="modal-close" aria-label="닫기" type="button">✕</button>
+          </header>
+          <div class="modal-language" id="modal-language"></div>
+          <pre class="modal-body" id="modal-body"></pre>
+          <footer class="modal-footer">
+            <button class="btn-primary" id="modal-copy" type="button">복사하기</button>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
