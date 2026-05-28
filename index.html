@@ -26,6 +26,28 @@
         </button>
       </header>
 
+      <nav class="tabs" role="tablist" aria-label="페이지 전환">
+        <button
+          class="tab is-active"
+          type="button"
+          role="tab"
+          data-tab="prompts"
+          aria-selected="true"
+        >
+          프롬프트
+        </button>
+        <button
+          class="tab"
+          type="button"
+          role="tab"
+          data-tab="techniques"
+          aria-selected="false"
+        >
+          프롬프팅 기법
+        </button>
+      </nav>
+
+      <section id="view-prompts" role="tabpanel" aria-label="프롬프트 목록">
       <section class="controls" aria-label="검색 및 필터">
         <div class="search-field">
           <input
@@ -93,6 +115,18 @@
         <span class="page-info" id="page-info">1 / 1</span>
         <button class="page-btn" id="next-page" type="button">다음</button>
       </nav>
+      </section>
+
+      <section id="view-techniques" role="tabpanel" aria-label="프롬프팅 기법" hidden>
+        <div class="techniques-intro">
+          <h2 class="techniques-intro-title">현재도 효과적인 프롬프팅 기법</h2>
+          <p class="techniques-intro-text">
+            추론 모델이 발전하면서 효용이 줄어든 기법은 제외하고, 지금도 결과 품질을 눈에 띄게
+            끌어올리는 11가지 기법만 모았습니다. 카드를 눌러 사용법과 예시를 확인하세요.
+          </p>
+        </div>
+        <div id="technique-grid" class="technique-grid"></div>
+      </section>
 
       <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -112,6 +146,59 @@
           <footer class="modal-footer">
             <button class="btn-primary" id="modal-copy" type="button">복사하기</button>
           </footer>
+        </div>
+      </div>
+
+      <div id="technique-modal" class="modal" hidden>
+        <div class="modal-backdrop" data-close="true"></div>
+        <div
+          class="modal-card technique-modal-card"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="technique-modal-title"
+        >
+          <header class="modal-header">
+            <div class="modal-heading">
+              <span class="technique-modal-icon" id="technique-modal-icon" aria-hidden="true"></span>
+              <h2 class="modal-title" id="technique-modal-title"></h2>
+              <p class="modal-subtitle" id="technique-modal-oneliner"></p>
+            </div>
+            <button
+              class="modal-close"
+              id="technique-modal-close"
+              aria-label="닫기"
+              type="button"
+            >
+              ✕
+            </button>
+          </header>
+          <div class="technique-modal-body">
+            <section class="technique-section">
+              <h3 class="technique-section-title">언제 쓰는가</h3>
+              <p class="technique-section-text" id="technique-modal-when"></p>
+            </section>
+            <section class="technique-section">
+              <h3 class="technique-section-title">작동 방식</h3>
+              <p class="technique-section-text" id="technique-modal-how"></p>
+            </section>
+            <section class="technique-section">
+              <div class="technique-example-header">
+                <h3 class="technique-section-title">예시 프롬프트</h3>
+                <button
+                  class="btn-primary technique-example-copy"
+                  id="technique-modal-copy"
+                  type="button"
+                >
+                  복사하기
+                </button>
+              </div>
+              <pre class="technique-example-body" id="technique-modal-example"></pre>
+            </section>
+            <section class="technique-section technique-section--caution">
+              <h3 class="technique-section-title">주의사항</h3>
+              <p class="technique-section-text" id="technique-modal-caution"></p>
+            </section>
+          </div>
         </div>
       </div>
     </div>

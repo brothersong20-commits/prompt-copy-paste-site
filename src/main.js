@@ -1,5 +1,6 @@
 import './style.css';
 import { fetchPrompts } from './parser.js';
+import { techniques } from './data/techniques.js';
 
 const PAGE_SIZE = 10;
 
@@ -9,7 +10,12 @@ const state = {
   query: '',
   category: '전체',
   page: 1,
-  sort: { key: null, direction: 'asc' }
+  sort: { key: null, direction: 'asc' },
+  activeTab: 'prompts'
+};
+
+const techniqueModalState = {
+  technique: null
 };
 
 const SORT_KEY_MAP = {
@@ -47,7 +53,21 @@ const els = {
   modalBody: document.getElementById('modal-body'),
   modalClose: document.getElementById('modal-close'),
   modalCopy: document.getElementById('modal-copy'),
-  themeToggle: document.getElementById('theme-toggle')
+  themeToggle: document.getElementById('theme-toggle'),
+  tabs: document.querySelectorAll('.tab'),
+  viewPrompts: document.getElementById('view-prompts'),
+  viewTechniques: document.getElementById('view-techniques'),
+  techniqueGrid: document.getElementById('technique-grid'),
+  techniqueModal: document.getElementById('technique-modal'),
+  techniqueModalIcon: document.getElementById('technique-modal-icon'),
+  techniqueModalTitle: document.getElementById('technique-modal-title'),
+  techniqueModalOneliner: document.getElementById('technique-modal-oneliner'),
+  techniqueModalWhen: document.getElementById('technique-modal-when'),
+  techniqueModalHow: document.getElementById('technique-modal-how'),
+  techniqueModalExample: document.getElementById('technique-modal-example'),
+  techniqueModalCaution: document.getElementById('technique-modal-caution'),
+  techniqueModalClose: document.getElementById('technique-modal-close'),
+  techniqueModalCopy: document.getElementById('technique-modal-copy')
 };
 
 function getInitialTheme() {
@@ -348,6 +368,72 @@ function closeModal() {
   modal.prompt = null;
 }
 
+function setActiveTab(tabName) {
+  if (state.activeTab === tabName) return;
+  state.activeTab = tabName;
+
+  els.tabs.forEach((tab) => {
+    const active = tab.dataset.tab === tabName;
+    tab.classList.toggle('is-active', active);
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+
+  els.viewPrompts.hidden = tabName !== 'prompts';
+  els.viewTechniques.hidden = tabName !== 'techniques';
+
+  if (tabName === 'techniques' && els.techniqueGrid.childElementCount === 0) {
+    renderTechniques();
+  }
+
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+}
+
+function renderTechniques() {
+  els.techniqueGrid.innerHTML = techniques
+    .map(
+      (t) => `
+        <button
+          class="technique-card"
+          type="button"
+          data-id="${escapeHtml(t.id)}"
+          aria-label="${escapeHtml(t.name)} 상세 보기"
+        >
+          <span class="technique-card-icon" aria-hidden="true">${escapeHtml(t.icon)}</span>
+          <span class="technique-card-name">${escapeHtml(t.name)}</span>
+          <span class="technique-card-oneliner">${escapeHtml(t.oneLiner)}</span>
+        </button>`
+    )
+    .join('');
+
+  els.techniqueGrid.querySelectorAll('.technique-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.id;
+      const technique = techniques.find((t) => t.id === id);
+      if (technique) openTechniqueModal(technique);
+    });
+  });
+}
+
+function openTechniqueModal(technique) {
+  techniqueModalState.technique = technique;
+  els.techniqueModalIcon.textContent = technique.icon || '';
+  els.techniqueModalTitle.textContent = technique.name || '';
+  els.techniqueModalOneliner.textContent = technique.oneLiner || '';
+  els.techniqueModalWhen.textContent = technique.whenToUse || '';
+  els.techniqueModalHow.textContent = technique.howItWorks || '';
+  els.techniqueModalExample.textContent = technique.example || '';
+  els.techniqueModalCaution.textContent = technique.caution || '';
+  els.techniqueModal.hidden = false;
+  document.body.classList.add('no-scroll');
+  els.techniqueModalClose.focus();
+}
+
+function closeTechniqueModal() {
+  els.techniqueModal.hidden = true;
+  document.body.classList.remove('no-scroll');
+  techniqueModalState.technique = null;
+}
+
 function bindEvents() {
   els.search.addEventListener('input', (e) => {
     state.query = e.target.value;
@@ -384,7 +470,29 @@ function bindEvents() {
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !els.modal.hidden) closeModal();
+    if (e.key === 'Escape') {
+      if (!els.techniqueModal.hidden) {
+        closeTechniqueModal();
+      } else if (!els.modal.hidden) {
+        closeModal();
+      }
+    }
+  });
+
+  els.tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      setActiveTab(tab.dataset.tab);
+    });
+  });
+
+  els.techniqueModalClose.addEventListener('click', closeTechniqueModal);
+  els.techniqueModal.addEventListener('click', (e) => {
+    if (e.target.dataset.close === 'true') closeTechniqueModal();
+  });
+  els.techniqueModalCopy.addEventListener('click', () => {
+    if (techniqueModalState.technique) {
+      copyText(techniqueModalState.technique.example);
+    }
   });
 
   els.tbody.addEventListener('keydown', (e) => {
